@@ -1,0 +1,71 @@
+name: "E2E Lab: Router + 8 Workers + Ping Gate + Automation"
+description: >
+  Full end-to-end lab workflow:
+    1) Configure router SSID/channel via Playwright
+    2) Wait until workers can see the SSID
+    3) Connect all 8 workers to Wi-Fi
+    4) Ping-gate: all workers must reach 192.168.1.100
+    5) Run automation program on all workers
+
+router:
+  base_url: http://192.168.1.1
+  bands:
+    "2.4G":
+      ssid: RFLabTest_2G
+      password: password
+      channel: "10"
+    "5G":
+      ssid: RFLabTest_5G
+      password: password
+      channel: "44"
+    "6G":
+      ssid: RFLabTest_6G
+      password: password
+      channel: "69"
+
+workers:
+  - url: "http://192.168.22.221:8080"
+    name: worker-01
+  - url: "http://192.168.22.222:8080"
+    name: worker-02
+  - url: "http://192.168.22.223:8080"
+    name: worker-03
+  - url: "http://192.168.22.224:8080"
+    name: worker-04
+  - url: "http://192.168.22.225:8080"
+    name: worker-05
+  - url: "http://192.168.22.226:8080"
+    name: worker-06
+  - url: "http://192.168.22.227:8080"
+    name: worker-07
+  - url: "http://192.168.22.228:8080"
+    name: worker-08
+
+steps:
+  - action: router_apply
+    description: "Set router per-band SSID/channel via Playwright"
+
+  - action: wait_ssid_broadcast
+    description: "Scan workers until all see the target SSID"
+    scan:
+      target_ssid: RFLabTest_2G
+      timeout_sec: 120
+      poll_interval_sec: 10
+
+  - action: wifi_connect_workers
+    description: "Connect all 8 workers to 2.4G SSID"
+    connect_band: "2.4G"
+
+  - action: ping_gate
+    description: "All workers must ping 192.168.1.100"
+    ping_gate:
+      host: "192.168.1.100"
+      count: 4
+      timeout_sec: 10
+
+  - action: run_automation
+    description: "Run automation program on all workers"
+    automation:
+      command: "python"
+      args: ["-c", "print('hello from worker')"]
+      timeout_sec: 60

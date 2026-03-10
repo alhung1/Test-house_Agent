@@ -9,6 +9,39 @@ from router.netgear_nighthawk.selectors import BandConfig
 logger = get_logger("router_netgear")
 
 
+async def detect_router_bands(
+    base_url: str,
+    user: str,
+    password: str,
+    artifacts_dir: str = "artifacts",
+) -> list[str]:
+    """Open the router GUI and return the bands actually present.
+
+    Returns e.g. ``["2.4G", "5G"]`` or ``["2.4G", "5G", "6G"]`` based
+    on which SSID input fields are visible on the Wireless Settings page.
+    On failure, collects screenshots/html/trace into *artifacts_dir*.
+    """
+    driver = NetgearNighthawkDriver(base_url=base_url, artifacts_dir=artifacts_dir)
+    try:
+        await driver.open()
+        await driver.login(user, password)
+        await driver.navigate_to_wireless()
+        detected = await driver.detect_available_bands()
+        logger.info(
+            "Router band detection complete: %s", detected,
+            extra={"action": "detect_bands", "step": "done"},
+        )
+        return detected
+    except Exception as exc:
+        logger.error(
+            "Router band detection failed: %s", exc,
+            extra={"action": "detect_bands", "step": "error"},
+        )
+        raise
+    finally:
+        await driver.close()
+
+
 async def apply_router_settings(
     base_url: str,
     user: str,

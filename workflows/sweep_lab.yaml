@@ -1,0 +1,48 @@
+name: "Multi-Band Channel Sweep"
+description: >
+  One-click sweep: auto-detect bands from router GUI, then iterate
+  over band x channel matrix running the full E2E pipeline per combo.
+  If the router only supports 2.4G + 5G, the 6G channels are skipped.
+
+router:
+  base_url: http://192.168.1.1
+
+workers:
+  - url: "http://192.168.22.221:8080"
+    name: worker-01
+  - url: "http://192.168.22.222:8080"
+    name: worker-02
+  - url: "http://192.168.22.223:8080"
+    name: worker-03
+  - url: "http://192.168.22.224:8080"
+    name: worker-04
+  - url: "http://192.168.22.225:8080"
+    name: worker-05
+  - url: "http://192.168.22.226:8080"
+    name: worker-06
+  - url: "http://192.168.22.227:8080"
+    name: worker-07
+  - url: "http://192.168.22.228:8080"
+    name: worker-08
+
+sweep:
+  base_ssid: RFLabTest
+  password: password
+  target_ping_ip: "192.168.1.100"
+  continue_on_failure: false
+
+  channels:
+    "2.4G": [1, 6, 11]
+    "5G": [36, 40, 44, 48]
+    "6G": [5, 37, 69]
+
+  scan_timeout_sec: 120
+  scan_poll_interval_sec: 10
+  ping_count: 4
+  ping_timeout_sec: 5
+
+  automation_enabled: false
+  automation:
+    command: "echo"
+    args: ["noop"]
+    timeout_sec: 10
