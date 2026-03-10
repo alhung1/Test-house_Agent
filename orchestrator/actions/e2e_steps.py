@@ -71,6 +71,9 @@ def _worker_label(w: WorkerTarget) -> str:
 # Shared HTTP helper
 # ---------------------------------------------------------------------------
 
+CONNECT_TIMEOUT = 5.0
+
+
 async def _call_worker(
     method: str,
     worker: WorkerTarget,
@@ -80,9 +83,10 @@ async def _call_worker(
 ) -> dict[str, Any]:
     """HTTP call to a single worker with retry."""
     url = f"{worker.url.rstrip('/')}{path}"
+    timeouts = httpx.Timeout(timeout, connect=CONNECT_TIMEOUT)
 
     async def _do():
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        async with httpx.AsyncClient(timeout=timeouts) as client:
             if method.upper() == "GET":
                 resp = await client.get(url, params=payload)
             else:

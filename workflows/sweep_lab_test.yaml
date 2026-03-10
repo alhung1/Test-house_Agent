@@ -1,0 +1,31 @@
+name: "Sweep Full Test (all channels, short worker timeouts)"
+router:
+  base_url: http://192.168.1.1
+
+workers:
+  - url: "http://192.168.22.221:8080"
+    name: worker-01
+  - url: "http://192.168.22.222:8080"
+    name: worker-02
+
+sweep:
+  base_ssid: RFLabTest
+  password: password
+  target_ping_ip: "192.168.1.100"
+  continue_on_failure: true
+
+  channels:
+    "2.4G": [1, 6, 11]
+    "5G": [36, 40, 44, 48]
+    "6G": [5, 37, 69]
+
+  scan_timeout_sec: 10
+  scan_poll_interval_sec: 5
+  ping_count: 2
+  ping_timeout_sec: 3
+
+  automation_enabled: false
+  automation:
+    command: "echo"
+    args: ["noop"]
+    timeout_sec: 5
