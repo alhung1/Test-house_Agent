@@ -1,0 +1,35 @@
+name: "Full E2E: Router + Workers + Local Wi-Fi"
+description: >
+  1) Apply SSID/password on Netgear Nighthawk via Playwright
+  2) Connect remote workers to new SSID
+  3) Connect local Wi-Fi adapter and verify
+
+wifi:
+  ssid: RFLabTest
+  password: password
+
+router:
+  base_url: http://192.168.1.1
+  bands:
+    - "2.4G"
+    - "5G"
+
+workers:
+  - url: http://worker1:8080
+    name: lab-pc-01
+  - url: http://worker2:8080
+    name: lab-pc-02
+
+steps:
+  - action: router_apply
+    description: "Set router SSID=RFLabTest on all bands"
+
+  - action: wait
+    wait_seconds: 10
+    description: "Wait for router to stabilize"
+
+  - action: wifi_connect_remote
+    description: "Connect all workers to RFLabTest"
+
+  - action: wifi_connect_local
+    description: "Connect local Wi-Fi adapter and verify"

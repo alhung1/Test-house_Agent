@@ -1,0 +1,31 @@
+---
+description: Engineering standards for the Windows Remote Automation Agent project
+globs: ["**/*.py"]
+alwaysApply: true
+---
+
+# Engineering Rules
+
+## Mandatory: Retry / Timeout / Verify / Logging / Artifacts
+
+- Every network call, subprocess invocation, and Playwright action MUST be wrapped with retry logic (configurable max_retries, exponential backoff).
+- Every operation MUST have an explicit timeout. Never use unbounded waits.
+- Every state-changing action MUST be followed by a verification step that confirms the expected outcome (e.g., SSID matches after connect, router page is reachable after apply).
+- All actions MUST produce structured JSON-line logs (timestamp, level, module, action, step, message, extra).
+- On failure in Playwright-based flows, MUST collect artifacts: screenshot (PNG), page HTML dump, trace.zip, and network.har if available.
+
+## Prohibited: Coordinate-Based Clicking
+
+- pyautogui or any screen-coordinate-based automation is PROHIBITED as the primary workflow.
+- All Wi-Fi operations MUST use `netsh wlan` commands.
+- All router UI automation MUST use Playwright with label-based or text-based selectors (get_by_text, get_by_label, get_by_role). Never hard-code pixel coordinates.
+
+## Polling Over Sleeping
+
+- Never use fixed `time.sleep()` to wait for an async operation to complete.
+- Use polling with backoff: repeatedly check a condition (HTTP reachable, SSID connected) with increasing intervals until success or timeout.
+
+## Secrets
+
+- Credentials MUST come from environment variables (loaded via python-dotenv).
+- Never hard-code passwords, usernames, or API keys in source code, comments, or README.

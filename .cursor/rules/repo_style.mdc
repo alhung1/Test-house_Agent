@@ -1,0 +1,38 @@
+---
+description: Repository structure and style conventions
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Repository Style Rules
+
+## Directory Structure
+
+```
+orchestrator/       - Workflow engine, actions, coordination
+worker/             - FastAPI service deployed on remote Windows machines
+router/             - Playwright-based router automation drivers
+scripts/            - Entry-point scripts for demos and E2E tests
+workflows/          - YAML workflow definitions
+artifacts/          - Runtime output (screenshots, traces, results) — never committed
+```
+
+## Naming Conventions
+
+- Python files: snake_case
+- Classes: PascalCase
+- Constants: UPPER_SNAKE_CASE
+- Pydantic models: PascalCase with descriptive suffixes (Request, Response, Config)
+
+## Secrets and Configuration
+
+- All secrets MUST be read from environment variables.
+- Provide `.env.example` with empty placeholder keys.
+- `.env` MUST be in `.gitignore`.
+- Never commit actual credentials.
+
+## Artifacts Directory
+
+- `artifacts/` is auto-generated at runtime.
+- It MUST be listed in `.gitignore`.
+- Scripts should create it if missing via `os.makedirs("artifacts", exist_ok=True)`.
